@@ -14,7 +14,8 @@ import {
   UserPlus,
   DollarSign,
   TrendingUp,
-  Clock
+  Clock,
+  Puzzle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,9 +38,11 @@ import {
 } from '@/components/ui/dialog';
 import { useAuth } from '@/hooks/useAuth';
 import { useBookings, useUpdateBookingStatus } from '@/hooks/useBookings';
-import { useServiceCategories, usePackages } from '@/hooks/useServices';
+import { usePackages } from '@/hooks/useServices';
 import { useToast } from '@/hooks/use-toast';
 import logo from '@/assets/handrest-logo.jpeg';
+import { PackagesTab } from '@/components/admin/PackagesTab';
+import { AddonsTab } from '@/components/admin/AddonsTab';
 import type { BookingStatus } from '@/types/database';
 
 const statusColors: Record<BookingStatus, string> = {
@@ -51,7 +54,7 @@ const statusColors: Record<BookingStatus, string> = {
   cancelled: 'bg-red-100 text-red-800',
 };
 
-type Tab = 'dashboard' | 'bookings' | 'staff' | 'packages' | 'settings';
+type Tab = 'dashboard' | 'bookings' | 'staff' | 'packages' | 'addons' | 'settings';
 
 function LoginForm({ onLogin }: { onLogin: (email: string, password: string) => Promise<void> }) {
   const [email, setEmail] = useState('');
@@ -375,62 +378,7 @@ function StaffTab() {
   );
 }
 
-function PackagesTab() {
-  const { data: categories } = useServiceCategories();
-  const { data: packages } = usePackages();
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Packages & Pricing</h1>
-        <Button variant="hero">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Package
-        </Button>
-      </div>
-      
-      {categories?.map(category => (
-        <Card key={category.id}>
-          <CardHeader>
-            <CardTitle>{category.name}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Package</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Duration</TableHead>
-                  <TableHead>Staff</TableHead>
-                  <TableHead>Max Area</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {packages?.filter(p => p.category_id === category.id).map(pkg => (
-                  <TableRow key={pkg.id}>
-                    <TableCell className="font-medium">{pkg.name}</TableCell>
-                    <TableCell className="max-w-xs truncate">{pkg.description}</TableCell>
-                    <TableCell>{pkg.duration_hours}h</TableCell>
-                    <TableCell>{pkg.min_staff}</TableCell>
-                    <TableCell>{pkg.max_sqft ? `${pkg.max_sqft} sq.ft` : 'Unlimited'}</TableCell>
-                    <TableCell className="font-semibold">₹{pkg.price.toLocaleString()}</TableCell>
-                    <TableCell>
-                      <Badge className={pkg.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
-                        {pkg.is_active ? 'Active' : 'Inactive'}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
-}
+// PackagesTab and AddonsTab are now imported from components/admin
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
@@ -467,6 +415,7 @@ export default function AdminDashboard() {
     { id: 'bookings', icon: Calendar, label: 'Bookings' },
     { id: 'staff', icon: Users, label: 'Staff' },
     { id: 'packages', icon: Package, label: 'Packages' },
+    { id: 'addons', icon: Puzzle, label: 'Add-ons' },
     { id: 'settings', icon: Settings, label: 'Settings' },
   ] as const;
 
@@ -523,6 +472,7 @@ export default function AdminDashboard() {
         {activeTab === 'bookings' && <BookingsTab />}
         {activeTab === 'staff' && <StaffTab />}
         {activeTab === 'packages' && <PackagesTab />}
+        {activeTab === 'addons' && <AddonsTab />}
         {activeTab === 'settings' && (
           <div className="text-center py-12 text-muted-foreground">
             Settings coming soon...
