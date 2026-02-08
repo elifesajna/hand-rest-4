@@ -47,19 +47,9 @@ export default function CustomerApp() {
     setScreen('property_details');
   };
 
-  const isBasicPackage = (pkg: Package | null) => 
-    pkg?.name.toUpperCase().includes('BASIC') ?? false;
-
   const handlePropertySubmit = (details: PropertyDetails) => {
     setPropertyDetails(details);
-    if (isBasicPackage(selectedPackage)) {
-      // Basic packages skip add-ons
-      setSelectedAddOns([]);
-      setAddonPrice(0);
-      setScreen('booking');
-    } else {
-      setScreen('addons');
-    }
+    setScreen('addons');
   };
 
   const handleUpgradeRequest = () => {
@@ -141,11 +131,7 @@ export default function CustomerApp() {
     } else if (screen === 'addons') {
       setScreen('property_details');
     } else if (screen === 'booking') {
-      if (isBasicPackage(selectedPackage)) {
-        setScreen('property_details');
-      } else {
-        setScreen('addons');
-      }
+      setScreen('addons');
     } else if (screen === 'confirmation') {
       setSelectedCategory(null);
       setSelectedPackage(null);
